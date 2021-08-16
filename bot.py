@@ -37,11 +37,10 @@ with app:
         message_to_send.append([first_line,id])
     print(message_to_send)
 
+    f = open('time_last_get.txt', 'w')
     for message,id in message_to_send:
         app.send_message(-1001507308710,message+'\nhttps://t.me/cnbeta_com/{}'.format(id),disable_web_page_preview=True)
-
-    f = open('time_last_get.txt', 'w')
-    f.write(str(time_now))
+        f.write(str(time_now))
     f.close()
 # 获取所有对话
 # with app:
