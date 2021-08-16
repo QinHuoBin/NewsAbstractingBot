@@ -26,22 +26,22 @@ with app:
             time_getting=b.date
             if time_getting<time_should_get_to:
                 break
-            message_to_handle.append([b.text,b.message_id])
+            message_to_handle.append([b.text,b.message_id,b.date])
             how_many_message_got+=1
     message_to_handle.reverse()
     print(message_to_handle)
 
     message_to_send=[]
-    for message,id in message_to_handle:
+    for message,id,date in message_to_handle:
         first_line=message.splitlines()[0]
-        message_to_send.append([first_line,id])
+        message_to_send.append([first_line,id,date])
     print(message_to_send)
 
 
-    for message,id in message_to_send:
+    for message,id,date in message_to_send:
         app.send_message(-1001507308710,message+'\nhttps://t.me/cnbeta_com/{}'.format(id),disable_web_page_preview=True)
         f = open('time_last_get.txt', 'w')
-        f.write(str(time_now))
+        f.write(str(date))
         f.close()
 
     f = open('time_last_finished.txt', 'w')
