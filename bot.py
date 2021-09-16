@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.errors.exceptions.flood_420 import FloodWait
 import time
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, MessageEntity
 
 # app = Client("my_account", api_id, api_hash, proxy={'hostname':'127.0.0.1', 'port':7890})
 app = Client("my_account", config_file='my_configuration.ini')
@@ -29,6 +29,8 @@ with app:
                 break
             message_to_handle.append([b.text, b.message_id, b.date])
             how_many_message_got += 1
+        print('回溯到{}，离最旧未处理消息还差{}秒，目前未处理消息{}条'.format(time_getting, time_getting - time_should_get_to,
+                                                      how_many_message_got))
     message_to_handle.reverse()
     print(message_to_handle)
 
@@ -43,7 +45,12 @@ with app:
     for message, id, date in message_to_send:
         while True:
             try:
-                app.send_message(-1001507308710, message + '\nhttps://t.me/cnbeta_com/{}'.format(id),
+                url_mark = '#'
+                url = 'https://t.me/cnbeta_com/{}'.format(id)
+                url_entity = MessageEntity(type='text_link', offset=len(message), length=len(url_mark), url=url)
+                # app.send_message(-1001507308710, message + '\nhttps://t.me/cnbeta_com/{}'.format(id),
+                #                  disable_web_page_preview=True)
+                app.send_message(chat_id=-1001507308710, text=message + url_mark, entities=[url_entity, ],
                                  disable_web_page_preview=True)
                 count += 1
                 break
