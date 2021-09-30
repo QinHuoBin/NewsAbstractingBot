@@ -28,13 +28,13 @@ with app:
     '''
     # 在time_getting未回溯到time_should_get_to之前一直循环
     # 注意，这里假设了一秒内不能有两条消息
-    while not time_getting < time_should_get_to:
+    while not time_getting <= time_should_get_to:
         # 获取历史消息
         a = app.get_history(-1001319457263, offset=how_many_message_got)
         for b in a:
             time_getting = b.date
             # 如果time_getting在time_should_get_to之前，则放弃这个消息
-            if time_getting < time_should_get_to:
+            if time_getting <= time_should_get_to:
                 break
 
             messgae = [b.text, b.message_id, b.date]
