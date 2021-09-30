@@ -68,7 +68,6 @@ with app:
             app.send_message(chat_id=-1001507308710, text=message + url_mark, entities=[url_entity, ],
                              disable_web_page_preview=True)
             count += 1
-            break
         except FloodWait as e:
             print('消息发送过快，服务器要求睡眠{}秒'.format(e.x))
             print(e)
