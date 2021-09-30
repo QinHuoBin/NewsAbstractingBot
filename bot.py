@@ -39,7 +39,7 @@ with app:
 
             messgae = [b.text, b.message_id, b.date]
             # 防止在处理过程中有新的消息，导致offset出现偏差，造成消息重复的现象
-            if message_to_handle.count(message_to_handle) == 0:
+            if message_to_handle.count(messgae) == 0:
                 message_to_handle.append(messgae)
 
             time_got = b.date
