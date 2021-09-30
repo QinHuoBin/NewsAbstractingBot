@@ -18,18 +18,33 @@ with app:
     time_should_get_to = time_last_get
     time_now = int(time.time())
     time_getting = time_now
+    time_got = time_now
     message_to_handle = []
 
     how_many_message_got = 0
+    '''
+        time_should_get_to  <-- time_getting
+    smaller                             bigger
+    '''
+    # 在time_getting未回溯到time_should_get_to之前一直循环
+    # 注意，这里假设了一秒内不能有两条消息
     while not time_getting < time_should_get_to:
+        # 获取历史消息
         a = app.get_history(-1001319457263, offset=how_many_message_got)
         for b in a:
             time_getting = b.date
+            # 如果time_getting在time_should_get_to之前，则放弃这个消息
             if time_getting < time_should_get_to:
                 break
-            message_to_handle.append([b.text, b.message_id, b.date])
+
+            messgae = [b.text, b.message_id, b.date]
+            # 防止在处理过程中有新的消息，导致offset出现偏差，造成消息重复的现象
+            if message_to_handle.count(message_to_handle) == 0:
+                message_to_handle.append(messgae)
+
+            time_got = b.date
             how_many_message_got += 1
-        print('回溯到{}，离最旧未处理消息还差{}秒，目前未处理消息{}条'.format(time_getting, time_getting - time_should_get_to,
+        print('回溯到{}，离最旧未处理消息还差{}秒，目前未处理消息{}条'.format(time_got, time_got - time_should_get_to,
                                                       how_many_message_got))
     message_to_handle.reverse()
     print(message_to_handle)
@@ -43,30 +58,31 @@ with app:
 
     count = 0
     for message, id, date in message_to_send:
-        while True:
-            try:
-                url_mark = '#'
-                url = 'https://t.me/cnbeta_com/{}'.format(id)
-                url_entity = MessageEntity(type='text_link', offset=len(message), length=len(url_mark), url=url)
-                # app.send_message(-1001507308710, message + '\nhttps://t.me/cnbeta_com/{}'.format(id),
-                #                  disable_web_page_preview=True)
-                app.send_message(chat_id=-1001507308710, text=message + url_mark, entities=[url_entity, ],
-                                 disable_web_page_preview=True)
-                count += 1
-                break
-            except FloodWait as e:
-                print('消息发送过快，服务器要求睡眠{}秒'.format(e.x))
-                print(e)
-                print('已发送{}条消息，共有{}条'.format(count, len(message_to_send)))
-                print('正在睡眠...')
-                time.sleep(int(e.x))
+        try:
+            url_mark = '#'
+            url = 'https://t.me/cnbeta_com/{}'.format(id)
+            url_entity = MessageEntity(type='text_link', offset=len(message), length=len(url_mark), url=url)
+            # app.send_message(-1001507308710, message + '\nhttps://t.me/cnbeta_com/{}'.format(id),
+            #                  disable_web_page_preview=True)
+            app.send_message(chat_id=-1001507308710, text=message + url_mark, entities=[url_entity, ],
+                             disable_web_page_preview=True)
+            count += 1
+            break
+        except FloodWait as e:
+            print('消息发送过快，服务器要求睡眠{}秒'.format(e.x))
+            print(e)
+            print('已发送{}条消息，共有{}条'.format(count, len(message_to_send)))
+            # print('正在睡眠...')
+            # time.sleep(int(e.x))
+            # 退出并在下一次运行脚本时处理历史消息
+            exit()
         f = open('time_last_get.txt', 'w')
         f.write(str(date))
         f.close()
 
-    f = open('time_last_finished.txt', 'w')
-    f.write(str(time_now))
-    f.close()
+f = open('time_last_finished.txt', 'w')
+f.write(str(time_now))
+f.close()
 # 获取所有对话
 # with app:
 #     for dialog in app.iter_dialogs():
