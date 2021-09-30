@@ -41,9 +41,10 @@ with app:
             # 防止在处理过程中有新的消息，导致offset出现偏差，造成消息重复的现象
             if message_to_handle.count(messgae) == 0:
                 message_to_handle.append(messgae)
+                time_got = b.date
+                # 假设处理过程中新消息不超过100条，否则就会一直获得新消息
+                how_many_message_got += 1
 
-            time_got = b.date
-            how_many_message_got += 1
         print('回溯到{}，离最旧未处理消息还差{}秒，目前未处理消息{}条'.format(time_got, time_got - time_should_get_to,
                                                       how_many_message_got))
     message_to_handle.reverse()
